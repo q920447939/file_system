@@ -36,7 +36,7 @@
 #### jar包版本
 
 ```java
-1.下载对应的`jar`包
+1.下载对应的`jar`包(https://github.com/q920447939/file_system/releases)
 
 2.java -jar file_system-0.0.1-SNAPSHOT.jar
 
