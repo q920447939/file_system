@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>文件上传</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="/css/main.css" rel="stylesheet"/>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+
+    <style>
+         #loading {
+         width: 20px;
+         height: 20px;
+         }
+
+         #img {
+         display: block;
+         width: 200px;
+         height: 200px;
+         border-radius: 50%;
+         background-color: #abcdef;
+         opacity: .5;
+         }
+
+
+    </style>
+
+    <style>
+        .list_con{
+            width: 600px;
+            margin: 50px auto 0;
+        }
+        .inputtext{
+            width: 550px;
+            height: 30px;
+            border: 1px solid #ccc;
+            padding: 0px;
+            text-indent: 10px;
+        }
+        .inputbtn{
+            width: 40px;
+            height: 32px;
+            padding: 0px;
+            border: 1px solid #ccc;
+        }
+        .list{
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            margin-top: 20px;
+        }
+        .list li{
+            height: 40px;
+            line-height: 40px;
+            border-bottom: 1px solid #ccc;
+        }
+        .list li span{
+            float: left;
+        }
+        .list li a{
+            float: right;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+
+
+    </style>
+
+    <!-- 引入 Bootstrap -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="upload-container">
+    <div class="upload-content">
+        <div class="single-upload">
+            <h3>上传文件</h3>
+            <div style="
+    display: flex;
+">
+                <input type="file" name="" id="ipt" multiple/>
+                <button id="btn" type="submit">上传文件</button>
+            </div>
+            <!-- bootstrap中引入条件 -->
+            <div class="progress" style="margin-top: 10px;width: 100px;margin-left: 10px;display:none">
+                <div id="progress" class="progress-bar progress-bar-striped active" role="progressbar"
+                     aria-valuenow="45"
+                     aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                    0%
+                </div>
+            </div>
+        </div>
+        <div>
+            <button onclick="queryList()">刷新</button>
+        </div>
+    </div>
+</div>
+
+
+<div>
+    <div class="list_con" id="list_d">
+        <!-- <ul id="list" class="list">
+             <li><span>你今天好不好</span><a href="#" class="up">↑</a><a href="#" class="down">↓</a><a href="#" class="del">删除</a>
+             </li>
+         </ul>-->
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    requestUrl="http://"+window.location.host+"/";
+
+    $(function() {
+        queryList();
+
+        $('#btn').on('click', function () {
+              // 获取文件列表
+              var file = $('#ipt')[0].files
+              // 判断是否选择了文件
+              if (file.length <= 0) {
+                return alert('请上传文件')
+              }
+              // 创建formdata
+              var fd = new FormData()
+              // 向formdata中传入数据
+              // fd.append()
+              // file是一个伪数组
+              fd.append('file', file[0])
+              // 用ajax传送数据
+              $.ajax({
+                type: 'post',
+                url: requestUrl+'uploadFile',
+                // 数据不需要编码
+                contentType: false,
+                // 数据对象不需要转换成键值对格式
+                processData: false,
+                data: fd,
+                beforeSend: function () {
+                  $('.progress').show()
+                },
+                complete: function () {
+                  $('.progress').hide()
+                },
+                success: function (res) {
+                  // 判断是否接收成功
+                  queryList ()
+                  alert("成功")
+                },
+                xhr: function xhr() {
+                  var xhr = new XMLHttpRequest()
+                  // 获取文件上传的进度
+                  xhr.upload.onprogress = function (e) {
+                    // e.lengthComputable表示当前的进度是否是可以计算,返回布尔值
+                    if (e.lengthComputable) {
+                      // e.loaded表示下载了多少数据, e.total表示数据总量
+                      var percentComplete = Math.ceil((e.loaded / e.total) * 100)
+                      // 让进度条的宽度变化
+                      $('#progress').css('width', percentComplete)
+                      // 在进度条中显示百分比
+                      $('#progress').html(percentComplete + '%')
+                    }
+                  }
+                  // 文件加载完成
+                  xhr.upload.onload = function () {
+                    $('#progress').removeClass('progress-bar progress-bar-striped').addClass('progress-bar progress-bar-success')
+                  }
+                  return xhr
+                }
+
+              })
+
+            })
+    });
+
+
+    function queryList () {
+        $("#list_d").html("");
+            //请求参数
+        var list = {};
+        $.ajax({
+            //请求方式
+            type : "GET",
+            //请求的媒体类型
+            contentType: "application/json;charset=UTF-8",
+            //请求地址
+            url : requestUrl+"listFileNames",
+            //数据，json字符串
+           // data : JSON.stringify(list),
+            //请求成功
+            success : function(result) {
+               var list = result;
+               var html_ = "";
+               if(list && list.length > 0 ){
+                 for (var i = 0 ;i<list.length;i++) {
+                    var item = list[i];
+                    html_ += ' <ul id="list" class="list"> ';
+                     html_ += '   <li><span>'+item.filename+'('+item.freeSpace+'MB)</span><a href="#" class="del" onclick="downloadFile(\''+item.filename+'\')">下载</a> <a href="#" class="del" onclick="deleteFile(\''+item.filename+'\')">删除</a>  ';
+                     html_ += '     </li>  ';
+                     html_ += '  </ul>  ';
+                 }
+               }
+               $("#list_d").html(html_);
+            },
+            //请求失败，包含具体的错误信息
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+    }
+
+    function downloadFile(fileName) {
+        window.location.href = requestUrl + "downloadFile/" + fileName;
+    }
+
+    function deleteFile (fileName) {
+        if(!fileName || fileName === '' ){
+            alert("文件不能为空！")
+            return ;
+        }
+        if( !confirm('是否删除' + fileName + "？")){
+            return;
+        }
+
+        $.ajax({
+            //请求方式
+            type : "GET",
+            //请求的媒体类型
+            contentType: "application/json;charset=UTF-8",
+            //请求地址
+            url : requestUrl+"deleteFile/"+fileName,
+            //数据，json字符串
+           // data : JSON.stringify(list),
+            //请求成功
+            success : function(result) {
+                if(result && result === true ){
+                    alert("删除成功")
+                    queryList()
+                }else{
+                    alert("删除失败")
+                }
+            },
+            //请求失败，包含具体的错误信息
+            error : function(e){
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>
