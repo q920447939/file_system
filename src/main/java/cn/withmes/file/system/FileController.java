@@ -15,13 +15,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,8 +55,12 @@ public class FileController {
     @Autowired
     private FileService fileService;
 
+    @javax.annotation.Resource
+    private FileProperties fileProperties; // 文件在本地存储的地址
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+
+    @GetMapping(value = "/admin/index")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public String index() {
         return "template/index";
     }
@@ -108,9 +111,6 @@ public class FileController {
     }
 
 
-    @javax.annotation.Resource
-    private FileProperties fileProperties; // 文件在本地存储的地址
-
     @GetMapping("/listFileNames")
     @ResponseBody
     public List<FileItem> listFileNames() {
@@ -138,6 +138,22 @@ public class FileController {
         return fileService.deleteFile(fileName);
     }
 
+
+    @GetMapping("/404")
+    public String notFoundPage() {
+        return "404";
+    }
+
+    @GetMapping("/403")
+    public String accessError() {
+        return "403";
+    }
+
+    @GetMapping("/500")
+    public String internalError() {
+        return "500";
+    }
+
     @Setter
     @Getter
     @Builder
@@ -148,4 +164,7 @@ public class FileController {
         private String lastModifiedStr;
         private String freeSpace;
     }
+
+
+
 }
