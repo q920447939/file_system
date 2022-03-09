@@ -10,9 +10,9 @@
     </parent>
     <groupId>cn.withmes</groupId>
     <artifactId>file_system</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0-RELEASE</version>
     <name>file_system</name>
-    <description>Demo project for Spring Boot</description>
+    <description>轻量文件系统</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
