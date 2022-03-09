@@ -37,9 +37,9 @@
 #### jar包版本
 
 ```java
-1.下载对应的`jar`包(https://github.com/q920447939/file_system/releases)
+1.下载对应的`jar`包(https://github.com/q920447939/file_system/releases/tag/2.0)
 
-2.java -jar file_system-0.0.1-SNAPSHOT.jar
+2.java -jar file_system-1.0-RELEASE.jar
 
 3.浏览器访问 http://127.0.0.1:8081即可进行操作
 ```
@@ -53,7 +53,7 @@
 ```
 1. git clone https://github.com/q920447939/file_system
 2. mvn clean package
-3. java -jar file_system-0.0.1-SNAPSHOT.jar
+3. java -jar file_system-1.0-RELEASE.jar
 4. 浏览器访问 http://127.0.0.1:8081即可进行操作
 ```
 
